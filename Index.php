@@ -9,30 +9,51 @@ class Product {
         $this->name = $name;
         $this->price = $price;
     }
+
+    public function getSubtotal($quantity)
+    {
+        return $this->price * $quantity;
+    }
 }
 
 class Transaction {
     private $items = [];
-    private $discount = 0;
 
-    public function addItem(Product $product, $quantity = 1) {
+    public function addItem(Product $product, $quantity) {
         $this->items[] = [
             'product' => $product,
             'quantity' => $quantity,
         ];
     }
 
-    public function setDiscount($discount) {
-        $this->discount = $discount;
+    public function getTotal()
+    {
+        $total = 0;
+        foreach ($this->items as $item){
+            $total += $item['product']->getSubtotal($item['quantity']);
+        }
+        return $total;
     }
 
-    public function getTotal() {
-        $total = 0;
-        foreach ($this->items as $item) {
-            $total += $item['product']->price * $item['quantity'];
+    public function getDiscount()
+    {
+        $total = $this->getTotal();
+        if ($total > 20000){
+            return 20;
+        } elseif ($total > 10000){
+            return 10;
+        } else {
+            return 0;
         }
-        $total -= $total * ($this->discount / 100);
-        return $total;
+    }
+
+    public function totalAfterDiscount()
+    {
+        $total = $this->getTotal();
+        $discount = $this->getDiscount();
+        $discountAmount = ($total * $discount)/100;
+
+        return $total - $discountAmount;
     }
 
     public function cetakStruk() {
@@ -42,24 +63,14 @@ class Transaction {
             echo "- {$item['quantity']} x {$item['product']->name}: Rp. {$item['product']->price} /Item";
             echo "<br>";
         }
-        echo "Diskon: {$this->discount}%";
         echo "<br>";
-        echo "Total: Rp." . $this->getTotal();
+        echo "Sub Total : Rp." . $this->getTotal() ;
+        echo "<br>";
+        echo "Diskon :" . $this->getDiscount() . "%" ;
+        echo "<br>";
+        echo "Total : Rp." . $this->totalAfterDiscount();
         echo "<br>";
         echo "=======================";
         echo "<br>";
     }
 }
-
-
-$product1 = new Product("Laptop", 1000);
-$product2 = new Product("Mouse", 500);
-
-$beli = new Transaction();
-
-$beli->addItem($product1, 2);
-$beli->addItem($product2, 2);
-
-$beli->setDiscount(10);
-
-$beli->cetakStruk();
