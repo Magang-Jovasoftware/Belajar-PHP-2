@@ -7,7 +7,7 @@
 </head>
 <body>
     <h2>Input Product</h2>
-    <form action="" method="post">
+    <form action="" method="post" name="inputProduct">
     <?php 
     include "Index.php";
     if (isset($_POST['hitung'])){
@@ -44,21 +44,21 @@
             </tr>
             <tr>
                 <td><input type="text" name="namaProduct1" size="25" value="<?php echo $name1 = isset($_POST['namaProduct1']) ? $_POST['namaProduct1'] : ''; ?>"></td>
-                <td><input type="text" name="hargaProduct1" size="25" value="<?php echo $price1 = isset($_POST['hargaProduct1']) ? $_POST['hargaProduct1'] : ''; ?>"></td>
-                <td><input type="text" name="jumlahProduct1" size="25" value="<?php echo $quantity1 = isset($_POST['jumlahProduct1']) ? $_POST['jumlahProduct1'] : ''; ?>"></td>
-                <td><input type="text" name="subTotal1" size="25" value="<?php echo isset($_POST['hitung']) ? $produk1->getSubtotal($quantity1) : ''; ?>"></td>
+                <td><input type="text" name="hargaProduct1" size="25" value="<?php echo $price1 = isset($_POST['hargaProduct1']) ? $_POST['hargaProduct1'] : ''; ?>" onFocus="startCalc(1);" onBlur="stopCalc(1);"></td>
+                <td><input type="text" name="jumlahProduct1" size="25" value="<?php echo $quantity1 = isset($_POST['jumlahProduct1']) ? $_POST['jumlahProduct1'] : ''; ?>" onFocus="startCalc(1);" onBlur="stopCalc(1);"></td>
+                <td><input type="text" name="subTotal1" size="25" value="<?php echo isset($_POST['hitung']) ? $produk1->getSubtotal($quantity1) : ''; ?>" readonly></td>
             </tr>
             <tr>
                 <td><input type="text" name="namaProduct2" size="25" value="<?php echo $name2 = isset($_POST['namaProduct2']) ? $_POST['namaProduct2'] : ''; ?>"></td>
-                <td><input type="text" name="hargaProduct2" size="25" value="<?php echo $price2 = isset($_POST['hargaProduct2']) ? $_POST['hargaProduct2'] : ''; ?>"></td>
-                <td><input type="text" name="jumlahProduct2" size="25" value="<?php echo $quantity2 = isset($_POST['jumlahProduct2']) ? $_POST['jumlahProduct2'] : ''; ?>"></td>
-                <td><input type="text" name="subTotal2" size="25" value="<?php echo isset($_POST['hitung']) ? $produk2->getSubtotal($quantity2) : ''; ?>"></td>
+                <td><input type="text" name="hargaProduct2" size="25" value="<?php echo $price2 = isset($_POST['hargaProduct2']) ? $_POST['hargaProduct2'] : ''; ?>" onFocus="startCalc(2);" onBlur="stopCalc(2);"></td>
+                <td><input type="text" name="jumlahProduct2" size="25" value="<?php echo $quantity2 = isset($_POST['jumlahProduct2']) ? $_POST['jumlahProduct2'] : ''; ?>" onFocus="startCalc(2);" onBlur="stopCalc(2);"></td>
+                <td><input type="text" name="subTotal2" size="25" value="<?php echo isset($_POST['hitung']) ? $produk2->getSubtotal($quantity2) : ''; ?>" readonly></td>
             </tr>
             <tr>
                 <td><input type="text" name="namaProduct3" size="25" value="<?php echo $name3 = isset($_POST['namaProduct3']) ? $_POST['namaProduct3'] : ''; ?>"></td>
-                <td><input type="text" name="hargaProduct3" size="25" value="<?php echo $price3 = isset($_POST['hargaProduct3']) ? $_POST['hargaProduct3'] : ''; ?>"></td>
-                <td><input type="text" name="jumlahProduct3" size="25" value="<?php echo $quantity3 = isset($_POST['jumlahProduct3']) ? $_POST['jumlahProduct3'] : ''; ?>"></td>
-                <td><input type="text" name="subTotal3" size="25" value="<?php echo isset($_POST['hitung']) ? $produk3->getSubtotal($quantity3) : ''; ?>"></td>
+                <td><input type="text" name="hargaProduct3" size="25" value="<?php echo $price3 = isset($_POST['hargaProduct3']) ? $_POST['hargaProduct3'] : ''; ?>" onFocus="startCalc(3);" onBlur="stopCalc(3);"></td>
+                <td><input type="text" name="jumlahProduct3" size="25" value="<?php echo $quantity3 = isset($_POST['jumlahProduct3']) ? $_POST['jumlahProduct3'] : ''; ?>" onFocus="startCalc(3);" onBlur="stopCalc(3);"></td>
+                <td><input type="text" name="subTotal3" size="25" value="<?php echo isset($_POST['hitung']) ? $produk3->getSubtotal($quantity3) : ''; ?>" readonly></td>
             </tr>
             <tr>
                 <td>Sub Total :</td>
@@ -81,5 +81,18 @@
     echo isset($_POST['hitung']) ? $transaction1->cetakStruk():'';
     ?>
     </br>
+    <script>
+    function startCalc(productNumber){
+    interval = setInterval(function(){
+        calc(productNumber);
+    }, 1);
+    }
+    function calc(productNumber){
+    let one = document.inputProduct['hargaProduct' + productNumber].value;
+    let two = document.inputProduct['jumlahProduct' + productNumber].value;
+    document.inputProduct['subTotal' + productNumber].value = (one * 1) * (two * 1);}
+    function stopCalc(){
+    clearInterval(interval);}
+    </script>
 </body>
 </html>
