@@ -10,29 +10,26 @@
     <form action="" method="post" name="inputProduct">
     <?php 
     include "Index.php";
+    // Mengambil jumlah produk dari form atau default 1
+    $numProducts = isset($_POST['numProducts']) ? $_POST['numProducts'] : 1;
+
     if (isset($_POST['hitung'])){
-        $name1 = $_POST['namaProduct1'];
-        $price1 = $_POST['hargaProduct1'];
-        $quantity1 = $_POST['jumlahProduct1'];
+        $products = [];
+        // Mendapatkan data barang dari form
+        for ($i = 1; $i <= $numProducts; $i++) {
+            $name = $_POST["namaProduct$i"];
+            $price = $_POST["hargaProduct$i"];
+            $quantity = $_POST["jumlahProduct$i"];
 
-        $name2 = $_POST['namaProduct2'];
-        $price2 = $_POST['hargaProduct2'];
-        $quantity2 = $_POST['jumlahProduct2']   ;
+            $product = new Product($name, $price);
+            $products[] = ['product' => $product, 'quantity' => $quantity];
+        }
 
-        $name3 = $_POST['namaProduct3'];
-        $price3 = $_POST['hargaProduct3'];
-        $quantity3 = $_POST['jumlahProduct3'];
-
-        $produk1 = new Product($name1, $price1);
-        $produk2 = new Product($name2, $price2);
-        $produk3 = new Product($name3, $price3);
-
-        $transaction1 = new Transaction();
-
-        $transaction1->addItem($produk1, $quantity1);
-        $transaction1->addItem($produk2, $quantity2);
-        $transaction1->addItem($produk3, $quantity3);
-
+        $transaction = new Transaction();
+        // Menambahkan setiap barang ke dalam transaksi
+        foreach ($products as $item){
+            $transaction->addItem($item['product'], $item['quantity']);
+        }
     }
     ?>
         <table>
@@ -42,46 +39,62 @@
                 <th width="50">Jumlah</th>
                 <th width="50">Subtotal</th>
             </tr>
+            <?php
+            // Menampilkan baris form dinamis berdasarkan data product
+            for ($i = 1; $i <= $numProducts; $i++) {
+            ?>
             <tr>
-                <td><input type="text" name="namaProduct1" size="25" value="<?php echo $name1 = isset($_POST['namaProduct1']) ? $_POST['namaProduct1'] : ''; ?>"></td>
-                <td><input type="text" name="hargaProduct1" size="25" value="<?php echo $price1 = isset($_POST['hargaProduct1']) ? $_POST['hargaProduct1'] : ''; ?>" onFocus="startCalc(1);" onBlur="stopCalc(1);"></td>
-                <td><input type="text" name="jumlahProduct1" size="25" value="<?php echo $quantity1 = isset($_POST['jumlahProduct1']) ? $_POST['jumlahProduct1'] : ''; ?>" onFocus="startCalc(1);" onBlur="stopCalc(1);"></td>
-                <td><input type="text" name="subTotal1" size="25" value="<?php echo isset($_POST['hitung']) ? $produk1->getSubtotal($quantity1) : ''; ?>" readonly></td>
+                    <td><input type="text" name="namaProduct<?php echo $i; ?>" size="25" value="<?php echo isset($_POST["namaProduct$i"]) ? $_POST["namaProduct$i"] : ''; ?>"></td>
+                    <td><input type="text" name="hargaProduct<?php echo $i; ?>" size="25" value="<?php echo isset($_POST["hargaProduct$i"]) ? $_POST["hargaProduct$i"] : ''; ?>" onFocus="startCalc(<?php echo $i; ?>);" onBlur="stopCalc(<?php echo $i; ?>);"></td>
+                    <td><input type="text" name="jumlahProduct<?php echo $i; ?>" size="25" value="<?php echo isset($_POST["jumlahProduct$i"]) ? $_POST["jumlahProduct$i"] : ''; ?>" onFocus="startCalc(<?php echo $i; ?>);" onBlur="stopCalc(<?php echo $i; ?>);"></td>
+                    <td><input type="text" name="subTotal<?php echo $i; ?>" size="25" value="<?php echo isset($_POST['hitung']) ? $products[$i-1]['product']->getSubtotal($products[$i-1]['quantity']) : ''; ?>" readonly></td>
             </tr>
+            <?php } ?>
             <tr>
-                <td><input type="text" name="namaProduct2" size="25" value="<?php echo $name2 = isset($_POST['namaProduct2']) ? $_POST['namaProduct2'] : ''; ?>"></td>
-                <td><input type="text" name="hargaProduct2" size="25" value="<?php echo $price2 = isset($_POST['hargaProduct2']) ? $_POST['hargaProduct2'] : ''; ?>" onFocus="startCalc(2);" onBlur="stopCalc(2);"></td>
-                <td><input type="text" name="jumlahProduct2" size="25" value="<?php echo $quantity2 = isset($_POST['jumlahProduct2']) ? $_POST['jumlahProduct2'] : ''; ?>" onFocus="startCalc(2);" onBlur="stopCalc(2);"></td>
-                <td><input type="text" name="subTotal2" size="25" value="<?php echo isset($_POST['hitung']) ? $produk2->getSubtotal($quantity2) : ''; ?>" readonly></td>
-            </tr>
-            <tr>
-                <td><input type="text" name="namaProduct3" size="25" value="<?php echo $name3 = isset($_POST['namaProduct3']) ? $_POST['namaProduct3'] : ''; ?>"></td>
-                <td><input type="text" name="hargaProduct3" size="25" value="<?php echo $price3 = isset($_POST['hargaProduct3']) ? $_POST['hargaProduct3'] : ''; ?>" onFocus="startCalc(3);" onBlur="stopCalc(3);"></td>
-                <td><input type="text" name="jumlahProduct3" size="25" value="<?php echo $quantity3 = isset($_POST['jumlahProduct3']) ? $_POST['jumlahProduct3'] : ''; ?>" onFocus="startCalc(3);" onBlur="stopCalc(3);"></td>
-                <td><input type="text" name="subTotal3" size="25" value="<?php echo isset($_POST['hitung']) ? $produk3->getSubtotal($quantity3) : ''; ?>" readonly></td>
+                <td colspan="4">
+                    <input type="hidden" name="numProducts" value="<?php echo isset($_POST['numProducts']) ? $_POST['numProducts'] + 1 : 1; ?>">
+                    <input type="submit" name="hitung" value="hitung">
+                    <button type="button" onclick="addProductRow()">Tambah Barang</button>
+                </td>
             </tr>
             <tr>
                 <td>Sub Total :</td>
-                <td><input type="text" name="getDiskon" size="1" value="<?php echo isset($_POST['hitung']) ? $transaction1->getTotal() : ''; ?>"><br></td>
+                <td><input type="text" name="getDiskon" size="5" value="<?php echo isset($_POST['hitung']) ? $transaction->getTotal() : ''; ?>"><br></td>
             </tr>
             <tr>
                 <td>Diskon :</td>
-                <td><input type="text" name="getDiskon" size="1" value="<?php echo isset($_POST['hitung']) ? $transaction1->getDiscount() . '%' : ''; ?>"><br></td>
+                <td><input type="text" name="getDiskon" size="5" value="<?php echo isset($_POST['hitung']) ? $transaction->getDiscount() . '%' : ''; ?>"><br></td>
             </tr>
             <tr>
                 <td>Total Belanja :</td>
-                <td><input type="text" name="getTotal" size="1" value="<?php echo isset($_POST['hitung']) ? $transaction1->totalAfterDiscount() : ''; ?>"><br></td>
+                <td><input type="text" name="getTotal" size="5" value="<?php echo isset($_POST['hitung']) ? $transaction->totalAfterDiscount() : ''; ?>"><br></td>
             </tr>
         </table>
-
-        <input type="submit" name="hitung" value="hitung">
     </form>
     <br>    
     <?php 
-    echo isset($_POST['hitung']) ? $transaction1->cetakStruk():'';
+    echo isset($_POST['hitung']) ? $transaction->cetakStruk():'';
     ?>
-    </br>
+    <br>
     <script>
+        // Function untuk menambahkan baris pada data
+        function addProductRow() {
+            let numProductsInput = document.querySelector("input[name='numProducts']");
+            numProductsInput.value = parseInt(numProductsInput.value) + 1;
+
+            let table = document.querySelector("table");
+            let row = table.insertRow(table.rows.length - 4);
+            let cell1 = row.insertCell(0);
+            let cell2 = row.insertCell(1);
+            let cell3 = row.insertCell(2);
+            let cell4 = row.insertCell(3);
+
+            cell1.innerHTML = `<input type="text" name="namaProduct${numProductsInput.value}" size="25" value="">`;
+            cell2.innerHTML = `<input type="text" name="hargaProduct${numProductsInput.value}" size="25" value="" onFocus="startCalc(${numProductsInput.value});" onBlur="stopCalc(${numProductsInput.value});">`;
+            cell3.innerHTML = `<input type="text" name="jumlahProduct${numProductsInput.value}" size="25" value="" onFocus="startCalc(${numProductsInput.value});" onBlur="stopCalc(${numProductsInput.value});">`;
+            cell4.innerHTML = `<input type="text" name="subTotal${numProductsInput.value}" size="25" value="" readonly>`;
+        }
+
     function startCalc(productNumber){
     interval = setInterval(function(){
         calc(productNumber);
