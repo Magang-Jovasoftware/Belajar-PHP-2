@@ -12,11 +12,14 @@
     <form action="" method="post" name="inputProduct" class="mb-4">
     <?php 
     include "Index.php";
+    include "db.php";
     // Mengambil jumlah produk dari form atau default 1
     $numProducts = isset($_POST['numProducts']) ? $_POST['numProducts'] : 1;
 
     if (isset($_POST['hitung'])){
         $products = [];
+        $stmt = $conn->prepare("INSERT INTO pembelian (product, price, quantity) VALUES (?, ?, ?)");
+
         // Mendapatkan data barang dari form
         for ($i = 1; $i <= $numProducts; $i++) {
             $name = $_POST["namaProduct$i"];
@@ -25,7 +28,17 @@
 
             $product = new Product($name, $price);
             $products[] = ['product' => $product, 'quantity' => $quantity];
+
+            // Ikat parameter ke pernyataan yang telah disiapkan
+            $stmt->bind_param("sii", $name, $price, $quantity);
+
+            //Jalankan pernyataan yang telah disiapkan
+            if ($stmt->execute() !== TRUE) {
+                echo "Error: " . $stmt->error;
+            }
         }
+        // Close the statement
+        $stmt->close();
 
         $transaction = new Transaction();
         // Menambahkan setiap barang ke dalam transaksi
@@ -33,6 +46,7 @@
             $transaction->addItem($item['product'], $item['quantity']);
         }
     }
+    $conn->close();
     ?>
         <table class="w-full mb-4 bg-gray-200 rounded">
             <tr class="bg-gray-300">
