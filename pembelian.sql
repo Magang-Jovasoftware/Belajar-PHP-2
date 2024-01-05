@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 29, 2023 at 09:53 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Waktu pembuatan: 05 Jan 2024 pada 08.21
+-- Versi server: 10.4.32-MariaDB
+-- Versi PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,44 +24,54 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pembelian`
+-- Struktur dari tabel `pembelian`
 --
 
 CREATE TABLE `pembelian` (
   `id` int(11) NOT NULL,
   `product` varchar(20) NOT NULL,
   `price` int(20) NOT NULL,
-  `quantity` int(20) NOT NULL
+  `quantity` int(20) NOT NULL,
+  `subtotal` int(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `pembelian`
+-- Dumping data untuk tabel `pembelian`
 --
 
-INSERT INTO `pembelian` (`id`, `product`, `price`, `quantity`) VALUES
-(6, 'Laptop', 10000, 2),
-(7, 'Keyboard', 10000, 4),
-(8, 'Laptop', 500, 4);
+INSERT INTO `pembelian` (`id`, `product`, `price`, `quantity`, `subtotal`) VALUES
+(43, 'Laptop', 10000, 1, 10000),
+(44, 'Keyboard', 10000, 4, 40000);
+
+--
+-- Trigger `pembelian`
+--
+DELIMITER $$
+CREATE TRIGGER `update_subtotal_trigger` BEFORE INSERT ON `pembelian` FOR EACH ROW BEGIN
+    SET NEW.subtotal = NEW.price * NEW.quantity;
+END
+$$
+DELIMITER ;
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `pembelian`
+-- Indeks untuk tabel `pembelian`
 --
 ALTER TABLE `pembelian`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT untuk tabel yang dibuang
 --
 
 --
--- AUTO_INCREMENT for table `pembelian`
+-- AUTO_INCREMENT untuk tabel `pembelian`
 --
 ALTER TABLE `pembelian`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
